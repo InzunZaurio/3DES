@@ -14,8 +14,20 @@ def generar_llave():
     print("Llave guardada en 'llave_3des.txt'")
     return key
 
-def cifrar_archivo(key):
+def cargar_llave():
+    nombre_archivo = input("Ingrese el nombre del archivo que contiene la llave en base64: ")
+    try:
+        with open(nombre_archivo, "rb") as file:
+            key_base64 = file.read()
+            key = base64.b64decode(key_base64)
+        print("Llave cargada exitosamente.")
+        return key
+    except FileNotFoundError:
+        print("Archivo no encontrado")
+
+def cifrar_archivo():
     nombre_archivo = input("Ingrese el nombre del archivo a cifrar: ")
+    key = cargar_llave()
     try:
         with open(nombre_archivo, "rb") as file:
             contenido = file.read()
@@ -34,8 +46,9 @@ def cifrar_archivo(key):
     except FileNotFoundError:
         print("Archivo no encontrado")
 
-def descifrar_archivo(key):
+def descifrar_archivo():
     nombre_archivo = input("Ingrese el nombre del archivo a descifrar: ")
+    key = cargar_llave()
     try:
         with open(nombre_archivo, "rb") as file:
             contenido_cifrado = file.read()
@@ -60,11 +73,11 @@ while True:
     opcion = input("Seleccione una opción: ")
 
     if opcion == "1":
-        llave = generar_llave()
+        generar_llave()
     elif opcion == "2":
-        cifrar_archivo(llave)
+        cifrar_archivo()
     elif opcion == "3":
-        descifrar_archivo(llave)
+        descifrar_archivo()
     elif opcion == "4":
         break
     else:
