@@ -4,13 +4,22 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 import os
 
-def cifrar_archivo():
+def generar_llave():
+    key = os.urandom(24)
+    key_base64 = base64.b64encode(key)
+    print("Llave en bytes:", key)
+    print("Llave en base64:", key_base64.decode())
+    with open("llave_3des.txt", "wb") as file:
+        file.write(key_base64)
+    print("Llave guardada en 'llave_3des.txt'")
+    return key
+
+def cifrar_archivo(key):
     nombre_archivo = input("Ingrese el nombre del archivo a cifrar: ")
     try:
         with open(nombre_archivo, "rb") as file:
             contenido = file.read()
             backend = default_backend()
-            key = os.urandom(24)
             cipher = Cipher(algorithms.TripleDES(key), modes.ECB(), backend=backend)
             encryptor = cipher.encryptor()
             padder = padding.PKCS7(algorithms.TripleDES.block_size).padder()
@@ -22,7 +31,6 @@ def cifrar_archivo():
             with open(nombre_archivo + "_cifrado.des_base64.txt", "wb") as file_cifrado_base64:
                 file_cifrado_base64.write(contenido_cifrado_base64)
         print("Archivo cifrado y guardado como", nombre_archivo + "_cifrado.des y", nombre_archivo + "_cifrado.des_base64.txt")
-        return key
     except FileNotFoundError:
         print("Archivo no encontrado")
 
@@ -43,22 +51,21 @@ def descifrar_archivo(key):
     except FileNotFoundError:
         print("Archivo no encontrado")
 
-llave = cifrar_archivo()
-descifrar_archivo(llave)
-
-
 while True:
     print("\nMenú:")
-    print("1. Cifrar archivo")
-    print("2. Descifrar archivo")
-    print("3. Salir")
+    print("1. Generar llave")
+    print("2. Cifrar archivo")
+    print("3. Descifrar archivo")
+    print("4. Salir")
     opcion = input("Seleccione una opción: ")
 
     if opcion == "1":
-        cifrar_archivo()
+        llave = generar_llave()
     elif opcion == "2":
-        descifrar_archivo()
+        cifrar_archivo(llave)
     elif opcion == "3":
+        descifrar_archivo(llave)
+    elif opcion == "4":
         break
     else:
         print("Opción no válida. Intente de nuevo.")
